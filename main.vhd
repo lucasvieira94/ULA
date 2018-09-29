@@ -33,7 +33,8 @@ entity main is
     port ( clock : in  STD_LOGIC;
            oper : in  STD_LOGIC_VECTOR (2 downto 0);
            output : out  STD_LOGIC_VECTOR (3 downto 0);
-           selector : out  STD_LOGIC_VECTOR (1 downto 0));
+           selector : out  STD_LOGIC_VECTOR (1 downto 0);
+			  flags : out STD_LOGIC_VECTOR (3 downto 0));
 end main;
 
 architecture Behavioral of main is
@@ -47,6 +48,9 @@ signal resultadoSoma: STD_LOGIC_VECTOR(3 downto 0);
 signal resultadoSub: STD_LOGIC_VECTOR(3 downto 0);
 signal seletorInterno : STD_LOGIC_VECTOR(1 downto 0);
 signal carryOut : STD_LOGIC;
+signal zero : STD_LOGIC;
+signal negativo : STD_LOGIC;
+signal overflow : STD_LOGIC;
 
 component fullAdder4bits
 port ( 	  a : in  STD_LOGIC_VECTOR (3 downto 0);
@@ -100,6 +104,18 @@ begin
 			  ELSE (A XOR B) WHEN (oper = "101")
 			  ELSE (A XNOR B) WHEN (oper = "110")
 			  ELSE (A NAND B);
+			  
+		carryOut <= NOT(carryOut) WHEN (oper = "001")
+			ELSE carryOut;		
+			  
+		zero <= "1" WHEN (output = "0000")
+			ELSE "0";
+			
+		negativo <= "1" WHEN (output(3) = "1")
+			ELSE "0";
+		
+		overflow <= "1" WHEN ((A(3) = B(3)) AND (output(3) = NOT(A(3))))
+			ELSE "0";
 		
 	END PROCESS upcount;	
 end Behavioral;
